@@ -68,10 +68,10 @@ function panluna.Meta(metadata)
 
   local function meta(data)
     local m = {}
-    if data == nil then
+    if data == nil or #data == 0 then
       return '{}'
     elseif type(data) == 'string' then
-      return '{"t":"MetaInlines","c":[' .. data:sub(1,-2) .. ']}'
+      return '{"t":"MetaInlines","c":[' .. data:sub(1, -2) .. ']}'
     elseif type(data) == "bool" then
       return '{"t":"MetaBoolean","c":' .. data .. '}'
     elseif is_list(data) then
