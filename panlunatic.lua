@@ -1,12 +1,12 @@
 --
--- panluna.lua
+-- panlunatic.lua
 --
 -- Copyright (c) 2016 Albert Krewinkel
 --
 -- This library is free software; you can redistribute it and/or modify it
 -- under the terms of the ISC license. See LICENSE for details.
 
-local panluna = {_version = "0.0.1"}
+local panlunatic = {_version = "0.0.1"}
 
 local json = require("dkjson")
 
@@ -38,13 +38,13 @@ local function type_str(str)
 end
 
 -- Blocksep is used to separate block elements.
-function panluna.Blocksep()
+function panlunatic.Blocksep()
   return ","
 end
 
 -- This function is called once for the whole document. Parameters:
 -- body is a string, metadata is a table, variables is a table.
-function panluna.Doc(body, metadata, variables)
+function panlunatic.Doc(body, metadata, variables)
   local buffer = {}
   local function add(s)
     table.insert(buffer, s)
@@ -55,7 +55,7 @@ function panluna.Doc(body, metadata, variables)
   return "{" .. table.concat(buffer,',') .. '}\n'
 end
 
-function panluna.Meta(metadata)
+function panlunatic.Meta(metadata)
   local function is_list(v)
     if type(v) ~= "table" then return false end
     for k,_ in pairs(v) do
@@ -96,93 +96,93 @@ end
 -- items is always an array of strings (the items in a list).
 -- Comments indicate the types of other variables.
 
-function panluna.Str(s)
+function panlunatic.Str(s)
   return json.encode({t = 'Str', c = s}) .. ","
 end
 
-function panluna.Space()
+function panlunatic.Space()
   return type_str('Space') .. ","
 end
 
-function panluna.SoftBreak()
+function panlunatic.SoftBreak()
   return json.encode({t = 'SoftBreak'}) .. ","
 end
 
-function panluna.LineBreak()
+function panlunatic.LineBreak()
   return json.encode({t = 'LineBreak'}) .. ","
 end
 
-function panluna.Emph(s)
+function panlunatic.Emph(s)
   return '{"t":"Emph","c":[' .. s:sub(1, -2) .. ']},'
 end
 
-function panluna.Strong(s)
+function panlunatic.Strong(s)
   return '{"t":"Strong","c":[' .. s:sub(1, -2) .. ']},'
 end
 
-function panluna.Subscript(s)
+function panlunatic.Subscript(s)
   return '{"t":"Subscript","c":[' .. s:sub(1, -2) .. ']},'
 end
 
-function panluna.Superscript(s)
+function panlunatic.Superscript(s)
   return '{"t":"Superscript","c":[' .. s:sub(1, -2) .. ']},'
 end
 
-function panluna.SmallCaps(s)
+function panlunatic.SmallCaps(s)
   return '{"t":"SmallCaps","c":[' .. s:sub(1, -2) .. ']},'
 end
 
-function panluna.Strikeout(s)
+function panlunatic.Strikeout(s)
   return '{"t":"Strikeout","c":[' .. s:sub(1, -2) .. ']},'
 end
 
-function panluna.Quoted(quote, s)
+function panlunatic.Quoted(quote, s)
   return '{"t":"Quoted","c":[' .. type_str(quote) .. ',[' .. s:sub(1,-2) .. ']]},'
 end
 
-function panluna.SingleQuoted(s)
+function panlunatic.SingleQuoted(s)
   return Quoted("SingleQuote", s)
 end
 
-function panluna.DoubleQuoted(s)
+function panlunatic.DoubleQuoted(s)
     return Quoted("DoubleQuote", s)
 end
 
-function panluna.Link(s, src, tit, attr)
+function panlunatic.Link(s, src, tit, attr)
   srctit = json.encode(src) .. ',' .. json.encode(tit)
   return '{"t":"Link","c":[' .. attributes(attr) .. ",[" .. s:sub(1, -2) .. '],['.. srctit .. ']]},'
 end
 
-function panluna.Image(s, src, tit, attr)
+function panlunatic.Image(s, src, tit, attr)
   srctit = json.encode(src) .. ',' .. json.encode(tit)
   return '{"t":"Image","c":[' .. attributes(attr) .. ",[" .. s:sub(1, -2) .. '],['.. srctit .. ']]},'
 end
 
-function panluna.Code(s, attr)
+function panlunatic.Code(s, attr)
   return '{"t":"Code","c":[' .. attributes(attr) .. ',' .. json.encode(s) .. ']},'
 end
 
-function panluna.InlineMath(s)
+function panlunatic.InlineMath(s)
   return '{"t":"Math","c":[{"t":"InlineMath"},' .. json.encode(s) .. ']},'
 end
 
-function panluna.DisplayMath(s)
+function panlunatic.DisplayMath(s)
   return '{"t":"Math","c":[{"t":"DisplayMath"},' .. json.encode(s) .. ']},'
 end
 
-function panluna.Note(s)
+function panlunatic.Note(s)
   return '{"t":"Note","c":[' .. s .. ']},'
 end
 
-function panluna.Span(s, attr)
+function panlunatic.Span(s, attr)
   return '{"t":"Span","c":[' .. attributes(attr) .. ",[" .. s:sub(1, -2) .. ']]},'
 end
 
-function panluna.RawInline(format, str)
+function panlunatic.RawInline(format, str)
   return '{"t":"RawInline","c":[' .. json.encode(format) .. ',' .. json.encode(str) .. ']},'
 end
 
-function panluna.Cite(s, cs)
+function panlunatic.Cite(s, cs)
   for _,cit in ipairs(cs) do
     cit.citationMode = {t = cit.citationMode}
     if cit.citationPrefix == "" then
@@ -195,28 +195,28 @@ function panluna.Cite(s, cs)
   return '{"t":"Cite","c":[' .. json.encode(cs) .. ",[" .. s:sub(1, -2) .. ']]},'
 end
 
-function panluna.Plain(s)
+function panlunatic.Plain(s)
   return '{"t":"Plain","c":[' .. s:sub(1, -2) .. ']}'
 end
 
-function panluna.Para(s)
+function panlunatic.Para(s)
   return '{"t":"Para","c":[' .. s:sub(1, -2) .. ']}'
 end
 
 -- lev is an integer, the header level.
-function panluna.Header(lev, s, attr)
+function panlunatic.Header(lev, s, attr)
   return '{"t":"Header","c":[' .. lev .. "," .. attributes(attr) .. ',[' .. s:sub(1, -2) .. ']]}'
 end
 
-function panluna.BlockQuote(s)
+function panlunatic.BlockQuote(s)
   return '{"t":"BlockQuote","c":[' .. s .. ']}'
 end
 
-function panluna.HorizontalRule()
+function panlunatic.HorizontalRule()
   return '{"t":"HorizontalRule"}'
 end
 
-function panluna.LineBlock(ls)
+function panlunatic.LineBlock(ls)
   lines = {}
   for _,l in ipairs(ls) do
     table.insert(lines, "[" .. l:sub(1, -2) .. "]")
@@ -224,11 +224,11 @@ function panluna.LineBlock(ls)
   return '{"t":"LineBlock","c":[' .. table.concat(lines, ',') .. ']}'
 end
 
-function panluna.CodeBlock(s, attr)
+function panlunatic.CodeBlock(s, attr)
   return '{"t":"CodeBlock","c":[' .. attributes(attr) .. "," .. json.encode(s) .. ']}'
 end
 
-function panluna.BulletList(items)
+function panlunatic.BulletList(items)
   buffer = {}
   for _,item in ipairs(items) do
     table.insert(buffer, '[' .. item .. ']' )
@@ -236,7 +236,7 @@ function panluna.BulletList(items)
   return '{"t":"BulletList","c":[' .. table.concat(buffer, ',') .. ']}'
 end
 
-function panluna.OrderedList(items, num, sty, delim)
+function panlunatic.OrderedList(items, num, sty, delim)
   item_strings = {}
   for _,item in ipairs(items) do
     table.insert(item_strings, '[' .. item .. ']')
@@ -246,7 +246,7 @@ function panluna.OrderedList(items, num, sty, delim)
     ',[' .. table.concat(item_strings, ',') .. ']]}'
 end
 
-function panluna.DefinitionList(items)
+function panlunatic.DefinitionList(items)
   local buffer = {}
   for _,item in pairs(items) do
     for k, v in pairs(item) do
@@ -257,14 +257,14 @@ function panluna.DefinitionList(items)
   return '{"t":"DefinitionList","c":[' .. table.concat(buffer, ',') .. "]}"
 end
 
-function panluna.CaptionedImage(src, tit, caption, attr)
+function panlunatic.CaptionedImage(src, tit, caption, attr)
   return Para(Image(caption, src, tit, attr):sub(1, -1))
 end
 
 -- Caption is a string, aligns is an array of strings,
 -- widths is an array of floats, headers is an array of
 -- strings, rows is an array of arrays of strings.
-function panluna.Table(caption, aligns, widths, headers, rows)
+function panlunatic.Table(caption, aligns, widths, headers, rows)
   local content = {}
   local function add(s)
     table.insert(content, s)
@@ -299,11 +299,11 @@ function panluna.Table(caption, aligns, widths, headers, rows)
   return '{"t":"Table","c":[' .. table.concat(content, ',')  .. ']}'
 end
 
-function panluna.RawBlock(format, str)
+function panlunatic.RawBlock(format, str)
   return '{"t":"RawBlock","c":[' .. json.encode(format) .. ',' .. json.encode(str) .. ']}'
 end
 
-function panluna.Div(s, attr)
+function panlunatic.Div(s, attr)
   return '{"t":"Div","c":[' .. attributes(attr) .. ',[' .. s .. ']]}'
 end
 
@@ -342,18 +342,18 @@ local is_inline = (function ()
   end
 end)()
 
-panluna.encode = function(elem)
+panlunatic.encode = function(elem)
   if is_inline(elem) then
     return json.encode(elem) .. ','
   end
   return json.encode(elem)
 end
 
-panluna.decode = function(s)
+panlunatic.decode = function(s)
   if s:sub(-2, -1) == ',' then
     return json.decode(s:sub(1, -2))
   end
   return json.decode(s)
 end
 
-return panluna
+return panlunatic
