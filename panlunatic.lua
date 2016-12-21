@@ -51,10 +51,11 @@ function panlunatic.Doc(body, metadata, variables)
   end
   add('"blocks":[' .. body .. ']')
   add('"pandoc-api-version":[1,17,0,4]')
-  add('"meta":' .. Meta(metadata) .. '')
+  add('"meta":' .. panlunatic.Meta(metadata))
   return "{" .. table.concat(buffer,',') .. '}\n'
 end
 
+-- Convert metadata table to JSON
 function panlunatic.Meta(metadata)
   local function is_list(v)
     if type(v) ~= "table" then return false end
@@ -68,12 +69,14 @@ function panlunatic.Meta(metadata)
 
   local function meta(data)
     local m = {}
-    if data == nil or #data == 0 then
+    if data == nil then
       return '{}'
     elseif type(data) == 'string' then
       return '{"t":"MetaInlines","c":[' .. data:sub(1, -2) .. ']}'
     elseif type(data) == "bool" then
       return '{"t":"MetaBoolean","c":' .. data .. '}'
+    elseif type(data) == "table" and not next(data) then
+      return '{}'
     elseif is_list(data) then
       for _,v in ipairs(data) do
         table.insert(m, meta(v))
