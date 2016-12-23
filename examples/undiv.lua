@@ -3,7 +3,7 @@
 -- Invoke with:
 --    pandoc -t undiv.lua [READER-OPTIONS] | pandoc -f json [WRITER-OPTIONS]
 
-panluna = require("panlunatic")
+panlunatic = require("panlunatic")
 
 function Div(s, attr)
   -- `s` contains a JSON string representing the div's content.
