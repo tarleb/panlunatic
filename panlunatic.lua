@@ -6,7 +6,7 @@
 -- This library is free software; you can redistribute it and/or modify it
 -- under the terms of the ISC license. See LICENSE for details.
 
-local panlunatic = {_version = "0.0.1"}
+local panlunatic = {_version = "0.0.2"}
 
 local json = require("dkjson")
 
@@ -186,14 +186,11 @@ function panlunatic.RawInline(format, str)
 end
 
 function panlunatic.Cite(s, cs)
+  -- get properties in the correct table format for json encoding
   for _,cit in ipairs(cs) do
     cit.citationMode = {t = cit.citationMode}
-    if cit.citationPrefix == "" then
-      cit.citationPrefix = {}
-    end
-    if cit.citationSuffix == "" then
-      cit.citationSuffix = {}
-    end
+    cit.citationPrefix = panlunatic.decode('[' .. cit.citationPrefix .. ']')
+    cit.citationSuffix = panlunatic.decode('[' .. cit.citationSuffix .. ']')
   end
   return '{"t":"Cite","c":[' .. json.encode(cs) .. ",[" .. s:sub(1, -2) .. ']]},'
 end
