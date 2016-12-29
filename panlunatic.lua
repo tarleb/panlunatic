@@ -79,6 +79,8 @@ function panlunatic.tometa(data)
 
   if data == nil then
     return nil
+  elseif type(data) == 'number' then
+    return '{"t":"MetaString","c":"' .. tostring(data) .. '"}'
   elseif type(data) == 'string' then
     return '{"t":"MetaInlines","c":[' .. data:sub(1, -2) .. ']}'
   elseif type(data) == "bool" then
