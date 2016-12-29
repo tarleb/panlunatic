@@ -59,7 +59,9 @@ end
 function panlunatic.Meta(metadata)
   local buffer = {}
   for k, v in pairs(metadata) do
-    table.insert(buffer, json.encode(k) .. ':' .. panlunatic.tometa(v))
+    if type(v) ~= "table" or next(v) ~= nil then
+      table.insert(buffer, json.encode(k) .. ':' .. panlunatic.tometa(v))
+    end
   end
   return '{' .. table.concat(buffer, ',') .. '}'
 end
@@ -76,13 +78,13 @@ function panlunatic.tometa(data)
   end
 
   if data == nil then
-    return '{}'
+    return nil
   elseif type(data) == 'string' then
     return '{"t":"MetaInlines","c":[' .. data:sub(1, -2) .. ']}'
   elseif type(data) == "bool" then
     return '{"t":"MetaBoolean","c":' .. data .. '}'
   elseif type(data) == "table" and not next(data) then
-    return '{}'
+    return nil
   elseif is_list(data) then
     local m = {}
     for _,v in ipairs(data) do
