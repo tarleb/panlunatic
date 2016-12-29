@@ -6,7 +6,7 @@
 -- This library is free software; you can redistribute it and/or modify it
 -- under the terms of the ISC license. See LICENSE for details.
 
-local panlunatic = {_version = "0.0.2"}
+local panlunatic = {_version = "0.0.3"}
 
 local json = require("dkjson")
 
@@ -57,6 +57,14 @@ end
 
 -- Convert metadata table to JSON
 function panlunatic.Meta(metadata)
+  local buffer = {}
+  for k, v in pairs(metadata) do
+    table.insert(buffer, json.encode(k) .. ':' .. panlunatic.tometa(v))
+  end
+  return '{' .. table.concat(buffer, ',') .. '}'
+end
+
+function panlunatic.tometa(data)
   local function is_list(v)
     if type(v) ~= "table" then return false end
     for k,_ in pairs(v) do
@@ -67,32 +75,29 @@ function panlunatic.Meta(metadata)
     return true
   end
 
-  local function meta(data)
+  if data == nil then
+    return '{}'
+  elseif type(data) == 'string' then
+    return '{"t":"MetaInlines","c":[' .. data:sub(1, -2) .. ']}'
+  elseif type(data) == "bool" then
+    return '{"t":"MetaBoolean","c":' .. data .. '}'
+  elseif type(data) == "table" and not next(data) then
+    return '{}'
+  elseif is_list(data) then
     local m = {}
-    if data == nil then
-      return '{}'
-    elseif type(data) == 'string' then
-      return '{"t":"MetaInlines","c":[' .. data:sub(1, -2) .. ']}'
-    elseif type(data) == "bool" then
-      return '{"t":"MetaBoolean","c":' .. data .. '}'
-    elseif type(data) == "table" and not next(data) then
-      return '{}'
-    elseif is_list(data) then
-      for _,v in ipairs(data) do
-        table.insert(m, meta(v))
-      end
-      return '{"t":"MetaList","c":[' .. table.concat(m, ',') .. ']}'
-    else
-      for k,v in pairs(data) do
-        table.insert(m, json.encode(k) .. ":" .. meta(v))
-      end
-      return '{' .. table.concat(m, ',') .. '}'
+    for _,v in ipairs(data) do
+      table.insert(m, panlunatic.tometa(v))
     end
-    return table.concat(m, ',')
+    return '{"t":"MetaList","c":[' .. table.concat(m, ',') .. ']}'
+  else
+    local m = {}
+    for k,v in pairs(data) do
+      table.insert(m, json.encode(k) .. ":" .. panlunatic.tometa(v))
+    end
+    return '{"t":"MetaMap","c":{' .. table.concat(m, ',') .. '}}'
   end
-
-  return meta(metadata)
 end
+
 
 -- The functions that follow render corresponding pandoc elements.
 -- s is always a string, attr is always a table of attributes, and
