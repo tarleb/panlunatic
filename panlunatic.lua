@@ -6,7 +6,7 @@
 -- This library is free software; you can redistribute it and/or modify it
 -- under the terms of the ISC license. See LICENSE for details.
 
-local panlunatic = {_version = "0.1.0"}
+local panlunatic = {_version = "0.1.1"}
 
 local json = require("dkjson")
 
@@ -75,7 +75,7 @@ function panlunatic.OldDoc(body, metadata, variables)
 end
 
 -- FIXME: do proper version test
-if os.getenv("PANDOC_VERSION") <= "1.17.2" then
+if os.getenv("PANDOC_VERSION") and os.getenv("PANDOC_VERSION") <= "1.17.2" then
   panlunatic.Doc = panlunatic.OldDoc
   type_table = function (str)
     return {t = str, c={}}
