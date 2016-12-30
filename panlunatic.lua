@@ -6,7 +6,7 @@
 -- This library is free software; you can redistribute it and/or modify it
 -- under the terms of the ISC license. See LICENSE for details.
 
-local panlunatic = {_version = "0.1.2"}
+local panlunatic = {_version = "0.1.3"}
 
 local json = require("dkjson")
 
@@ -23,8 +23,8 @@ end
 
 -- Helper function to convert an attributes table into json string
 local function attributes(attr)
-  classes = words(attr.class)
-  kv = {}
+  local classes = words(attr.class)
+  local kv = {}
   for k,v in pairs(attr) do
     if k ~= "id" and k ~= "class" then
       table.insert(kv, {k, v})
@@ -188,12 +188,12 @@ function panlunatic.DoubleQuoted(s)
 end
 
 function panlunatic.Link(s, src, tit, attr)
-  srctit = json.encode(src) .. ',' .. json.encode(tit)
+  local srctit = json.encode(src) .. ',' .. json.encode(tit)
   return '{"t":"Link","c":[' .. attributes(attr) .. ",[" .. s:sub(1, -2) .. '],['.. srctit .. ']]},'
 end
 
 function panlunatic.Image(s, src, tit, attr)
-  srctit = json.encode(src) .. ',' .. json.encode(tit)
+  local srctit = json.encode(src) .. ',' .. json.encode(tit)
   return '{"t":"Image","c":[' .. attributes(attr) .. ",[" .. s:sub(1, -2) .. '],['.. srctit .. ']]},'
 end
 
@@ -253,7 +253,7 @@ function panlunatic.HorizontalRule()
 end
 
 function panlunatic.LineBlock(ls)
-  lines = {}
+  local lines = {}
   for _,l in ipairs(ls) do
     table.insert(lines, "[" .. l:sub(1, -2) .. "]")
   end
@@ -265,7 +265,7 @@ function panlunatic.CodeBlock(s, attr)
 end
 
 function panlunatic.BulletList(items)
-  buffer = {}
+  local buffer = {}
   for _,item in ipairs(items) do
     table.insert(buffer, '[' .. item .. ']' )
   end
@@ -273,11 +273,11 @@ function panlunatic.BulletList(items)
 end
 
 function panlunatic.OrderedList(items, num, sty, delim)
-  item_strings = {}
+  local item_strings = {}
   for _,item in ipairs(items) do
     table.insert(item_strings, '[' .. item .. ']')
   end
-  listAttrs = {num, type_table(sty), type_table(delim)}
+  local listAttrs = {num, type_table(sty), type_table(delim)}
   return '{"t":"OrderedList","c":[' .. json.encode(listAttrs) ..
     ',[' .. table.concat(item_strings, ',') .. ']]}'
 end
@@ -316,7 +316,7 @@ function panlunatic.Table(caption, aligns, widths, headers, rows)
 
   add('[' .. caption:sub(1, -2) .. ']')
 
-  alignsTables = {}
+  local alignsTables = {}
   for _,align in ipairs(aligns) do
     table.insert(alignsTables, type_table(align))
   end
@@ -326,7 +326,7 @@ function panlunatic.Table(caption, aligns, widths, headers, rows)
 
   add(row_string(headers))
 
-  row_strings = {}
+  local row_strings = {}
   for _, row in ipairs(rows) do
     table.insert(row_strings, row_string(row))
   end
