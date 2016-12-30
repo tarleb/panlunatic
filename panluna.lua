@@ -20,7 +20,7 @@ local panluna = {_version = "0.0.1"}
 
 local json = require("dkjson")
 
-block_definitions = {
+local block_definitions = {
   Plain = {content = Inlines},
   Para = {content = Inlines},
   BlockQuote = {content = Blocks},
@@ -34,56 +34,83 @@ block_definitions = {
   LineBlock = {content = LineItems}
 }
 
-LineItems = {}
-
-local inline_definitions = {
-  Emph = {{content = Inlines}},
-  Span = {{attributes = Attributes}, {content = Inlines}},
-  Strong = {{content = Inlines}},
-  Subscript = {{content = Inlines}},
-  Superscript = {{content = Inlines}},
-  Strikeout = {{content = Inlines}},
-  SmallCaps = {{content = Inlines}},
-  Note = {{content = Blocks}},
-  Quoted = {{quote_type = QuoteType}, {content = Inlines}},
-  Cite = {{content = Text}},
-  Str = {{content = Text}},
-  Code = {{attributes = Attributes}, {content = Text}},
-  Math = {{format = MathType}, {content = Text}},
-  RawInline = {{format = Text}, {content = Text}},
-}
+local LineItems = {}
+local Citations = {}
 
 local Text = {}
-local function Text.from_json(t)
-  assert(type(t) == "string")
+function Text.from_json(t)
+  assert(type(t) == "string", "String expected as value of type 'Text'")
   return t
 end
 
+local MathType = {}
+function MathType.from_json(t)
+  return t.t
+end
+
+local get_inline_definition
+
 local Inline = {}
-local function Inline.from_json_table(t)
-  eltype = inline_definitions[t]
-  el = {}
-  for i, attr in eltype do
-    attr_name, attr_type = attr
-    el[attr_name] = attr_type:from_json_table(t.c[i])
+function Inline.from_json(t)
+  local element_definition = get_inline_definition(t.t)
+  local el = {type = t.t}
+  if (#element_definition == 0 and next(element_definition) ~= nil) then
+    local attr_name, attr_type = next(element_definition)
+    el[attr_name] = attr_type.from_json(t.c)
+  else
+    for i, attr in ipairs(element_definition) do
+      local attr_name, attr_type = next(attr)
+      el[attr_name] = attr_type.from_json(t.c[i])
+    end
   end
+  return el
 end
 
 local Inlines = {}
-local function Inlines.from_json_table(t)
+function Inlines.from_json(list_of_inlines)
   local res = {}
-  for _, e in ipairs(t) do
-    table.insert(res, Inline.from_json_table(e))
+  for _, element in ipairs(list_of_inlines) do
+    table.insert(res, Inline.from_json(element))
   end
   return res
 end
 
-local Str = {}
-setmetatable(Str, Inline)
-local function Str.from_json_table(s)
-  -- FIXME: check type
-  return s
+-- local Str = {}
+-- setmetatable(Str, Inline)
+-- function Str.from_json(s)
+--   -- FIXME: check type
+--   return s
+-- end
+
+-- Order matters, so we need arrays of type definitions.
+local inline_definitions = {
+  Cite = {{citations = Citations}, {content = Text}},
+  Code = {{attributes = Attributes}, {content = Text}},
+  Emph = {content = Inlines},
+  Image = {{attributes = Attributes}, {content = Inlines},
+          {{src = Text}, {title = Text}}},
+  Link = {{attributes = Attributes}, {content = Inlines},
+    {{src = Text}, {title = Text}}},
+  LineBreak = {},
+  Math = {{format = MathType}, {content = Text}},
+  Note = {content = Blocks},
+  Quoted = {{quote_type = QuoteType}, {content = Inlines}},
+  RawInline = {{format = Text}, {content = Text}},
+  SmallCaps = {content = Inlines},
+  SoftBreak = {},
+  Space = {},
+  Span = {{attributes = Attributes}, {content = Inlines}},
+  Str = {content = Text},
+  Strikeout = {content = Inlines},
+  Strong = {content = Inlines},
+  Subscript = {content = Inlines},
+  Superscript = {content = Inlines}
+}
+
+get_inline_definition = function (inline_type)
+  return inline_definitions[inline_type]
 end
+
 
 function panluna.from_json(s)
   doc = json.decode(s)
@@ -92,6 +119,11 @@ function panluna.from_json(s)
     return doc
   end
   doc = json.decode(s)
-  
 end
 
+panluna.Text = Text
+panluna.Str = Str
+panluna.Inline = Inline
+panluna.Inlines = Inlines
+panluna.inline_definitions = inline_definitions
+return panluna
