@@ -180,11 +180,11 @@ function panlunatic.Quoted(quote, s)
 end
 
 function panlunatic.SingleQuoted(s)
-  return Quoted("SingleQuote", s)
+  return panlunatic.Quoted("SingleQuote", s)
 end
 
 function panlunatic.DoubleQuoted(s)
-    return Quoted("DoubleQuote", s)
+  return panlunatic.Quoted("DoubleQuote", s)
 end
 
 function panlunatic.Link(s, src, tit, attr)
@@ -294,7 +294,7 @@ function panlunatic.DefinitionList(items)
 end
 
 function panlunatic.CaptionedImage(src, tit, caption, attr)
-  return Para(Image(caption, src, tit, attr):sub(1, -1))
+  return panlunatic.Para(Image(caption, src, tit, attr):sub(1, -1))
 end
 
 -- Caption is a string, aligns is an array of strings,
