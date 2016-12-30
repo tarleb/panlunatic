@@ -33,8 +33,12 @@ local function attributes(attr)
   return json.encode({attr.id, classes, kv})
 end
 
+local function type_table(str)
+  return {t = str}
+end
+
 local function type_str(str)
-  return json.encode{t = str}
+  return json.encode(type_table(str))
 end
 
 -- Blocksep is used to separate block elements.
@@ -45,6 +49,7 @@ end
 -- This function is called once for the whole document. Parameters:
 -- body is a string, metadata is a table, variables is a table.
 function panlunatic.Doc(body, metadata, variables)
+  -- New API format (post 1.17.4)
   local buffer = {}
   local function add(s)
     table.insert(buffer, s)
@@ -53,6 +58,28 @@ function panlunatic.Doc(body, metadata, variables)
   add('"pandoc-api-version":[1,17,0,4]')
   add('"meta":' .. panlunatic.Meta(metadata))
   return "{" .. table.concat(buffer,',') .. '}\n'
+end
+
+-- Old API format (pre 1.17.4)
+function panlunatic.OldDoc(body, metadata, variables)
+  local buffer = {}
+  local function add(s)
+    table.insert(buffer, s)
+  end
+  add('[{"unMeta":')
+  add(panlunatic.Meta(metadata))
+  add('},[')
+  add(body)
+  add(']]\n')
+  return table.concat(buffer)
+end
+
+-- FIXME: do proper version test
+if os.getenv("PANDOC_VERSION") < "1.17.4" then
+  panlunatic.Doc = panlunatic.OldDoc
+  type_table = function (str)
+    return {t = str, c={}}
+  end
 end
 
 -- Convert metadata table to JSON
@@ -117,11 +144,11 @@ function panlunatic.Space()
 end
 
 function panlunatic.SoftBreak()
-  return json.encode({t = 'SoftBreak'}) .. ","
+  return type_str('SoftBreak') .. ","
 end
 
 function panlunatic.LineBreak()
-  return json.encode({t = 'LineBreak'}) .. ","
+  return type_str('LineBreak') .. ","
 end
 
 function panlunatic.Emph(s)
@@ -175,11 +202,11 @@ function panlunatic.Code(s, attr)
 end
 
 function panlunatic.InlineMath(s)
-  return '{"t":"Math","c":[{"t":"InlineMath"},' .. json.encode(s) .. ']},'
+  return '{"t":"Math","c":[' .. type_str("InlineMath") .. ',' .. json.encode(s) .. ']},'
 end
 
 function panlunatic.DisplayMath(s)
-  return '{"t":"Math","c":[{"t":"DisplayMath"},' .. json.encode(s) .. ']},'
+  return '{"t":"Math","c":[' .. type_str("InlineMath") .. ',' .. json.encode(s) .. ']},'
 end
 
 function panlunatic.Note(s)
@@ -197,7 +224,7 @@ end
 function panlunatic.Cite(s, cs)
   -- get properties in the correct table format for json encoding
   for _,cit in ipairs(cs) do
-    cit.citationMode = {t = cit.citationMode}
+    cit.citationMode = type_table(cit.citationMode)
     cit.citationPrefix = panlunatic.decode('[' .. cit.citationPrefix .. ']')
     cit.citationSuffix = panlunatic.decode('[' .. cit.citationSuffix .. ']')
   end
@@ -222,7 +249,7 @@ function panlunatic.BlockQuote(s)
 end
 
 function panlunatic.HorizontalRule()
-  return '{"t":"HorizontalRule"}'
+  return type_str("HorizontalRule")
 end
 
 function panlunatic.LineBlock(ls)
@@ -250,7 +277,7 @@ function panlunatic.OrderedList(items, num, sty, delim)
   for _,item in ipairs(items) do
     table.insert(item_strings, '[' .. item .. ']')
   end
-  listAttrs = {num, {t = sty}, {t = delim}}
+  listAttrs = {num, type_table(sty), type_table(delim)}
   return '{"t":"OrderedList","c":[' .. json.encode(listAttrs) ..
     ',[' .. table.concat(item_strings, ',') .. ']]}'
 end
@@ -291,7 +318,7 @@ function panlunatic.Table(caption, aligns, widths, headers, rows)
 
   alignsTables = {}
   for _,align in ipairs(aligns) do
-    table.insert(alignsTables, {t = align})
+    table.insert(alignsTables, type_table(align))
   end
   add(json.encode(alignsTables))
 
