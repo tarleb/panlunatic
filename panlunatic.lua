@@ -206,7 +206,7 @@ function panlunatic.InlineMath(s)
 end
 
 function panlunatic.DisplayMath(s)
-  return '{"t":"Math","c":[' .. type_str("InlineMath") .. ',' .. json.encode(s) .. ']},'
+  return '{"t":"Math","c":[' .. type_str("DisplayMath") .. ',' .. json.encode(s) .. ']},'
 end
 
 function panlunatic.Note(s)
