@@ -18,10 +18,6 @@ before_install:
   - tar zvxf data.tar.gz
   - cd ..
 
-matrix:
-  allow_failures:
-    - env: PANDOC_VERSION=1.17.2-1
-
 script:
   - git clone https://github.com/tarleb/panlunatic
 

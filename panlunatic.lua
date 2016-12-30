@@ -6,7 +6,7 @@
 -- This library is free software; you can redistribute it and/or modify it
 -- under the terms of the ISC license. See LICENSE for details.
 
-local panlunatic = {_version = "0.0.3"}
+local panlunatic = {_version = "0.1.0"}
 
 local json = require("dkjson")
 
@@ -49,7 +49,7 @@ end
 -- This function is called once for the whole document. Parameters:
 -- body is a string, metadata is a table, variables is a table.
 function panlunatic.Doc(body, metadata, variables)
-  -- New API format (post 1.17.4)
+  -- New API format (post 1.18)
   local buffer = {}
   local function add(s)
     table.insert(buffer, s)
@@ -60,7 +60,7 @@ function panlunatic.Doc(body, metadata, variables)
   return "{" .. table.concat(buffer,',') .. '}\n'
 end
 
--- Old API format (pre 1.17.4)
+-- Old API format (pre 1.18)
 function panlunatic.OldDoc(body, metadata, variables)
   local buffer = {}
   local function add(s)
@@ -75,7 +75,7 @@ function panlunatic.OldDoc(body, metadata, variables)
 end
 
 -- FIXME: do proper version test
-if os.getenv("PANDOC_VERSION") < "1.17.4" then
+if os.getenv("PANDOC_VERSION") <= "1.17.2" then
   panlunatic.Doc = panlunatic.OldDoc
   type_table = function (str)
     return {t = str, c={}}
