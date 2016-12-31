@@ -16,7 +16,7 @@ TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
 THIS SOFTWARE.
 
 ]]
-local panluna = {_version = "0.0.1"}
+local _version = "0.0.1"
 
 local json = require("dkjson")
 
@@ -95,7 +95,7 @@ function Element:new(t)
   return t
 end
 
-function Element:build(element_type, content)
+function Element:from_json(t)
   local function get_value(c, value_type)
     if #value_type > 0 then
       local _, list_element_type = next(value_type)
@@ -109,6 +109,7 @@ function Element:build(element_type, content)
     end
   end
 
+  local element_type, content = t.t, t.c
   local element = self:new{type = element_type}
   local definition = element:get_definition()
   if #definition == 0 and next(definition) ~= nil then
@@ -122,11 +123,6 @@ function Element:build(element_type, content)
   end
   return element
 end
-
-function Element:from_json(t)
-  return self:build(t.t, t.c)
-end
-
 
 local Inline = Element:new()
 function Inline:new(o)
@@ -182,25 +178,42 @@ function Inline.to_json(element)
   return build_json_structure(element, Inline)
 end
 
-function build_json_structure(element)
-  local eldef = getmetatable(element).get_definition(element.type)
+function Inline:build_json_structure()
+  local eldef = self:get_definition()
   local json_struct = {}
   return json_struct
 end
 
-function panluna.from_json(s)
-  doc = json.decode(s)
-  if doc.meta and doc.body and doc['pandoc-api-version'] then
-    doc.body = panluna.from_json(doc.body)
-    return doc
+local M = {
+  MathType = MathType,
+  Text = Text,
+  Inline = Inline,
+  flattened = flattened
+}
+
+-- Also export constructor for each element type
+for eltype, definition in pairs(Inline.definitions) do
+  local function element_creator(...)
+    local element_args = {type = eltype}
+    if next(definition) == nil then
+      -- do nothing
+    elseif #definition == 0 then
+      local _, attr_type = next(definition)
+      if #attr_type > 0 then
+        element_args.content = {...}
+      else
+        element_args.content = ...
+      end
+    else
+      for i, v in ipairs(...) do
+        attr_name, _ = next(definition[i])
+        print(attr_name)
+        element_args[attr_name] = v
+      end
+    end
+    return Inline:new(element_args)
   end
-  doc = json.decode(s)
+  M[eltype] = element_creator
 end
 
-panluna.MathType = MathType
-panluna.Text = Text
-panluna.Str = Str
-panluna.Inline = Inline
-panluna.Inlines = Inlines
-panluna.flattened = flattened
-return panluna
+return M
