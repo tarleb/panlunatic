@@ -56,9 +56,21 @@ local LineItems = {}
 local Citations = {}
 
 local Text = {}
-function Text:from_json(t)
-  assert(type(t) == "string", "String expected as value of type 'Text'")
+function Text:new(s)
+  local t = {type = "Text", value = s}
+  setmetatable(t, self)
+  self.__index = self
   return t
+end
+function Text:from_json(s)
+  assert(type(s) == "string", "String expected as value of type 'Text'")
+  return self:new(s)
+end
+function Text:to_json_structure()
+  return self.value
+end
+function Text.__tostring(text)
+  return text.value
 end
 
 local Type = {}
@@ -78,10 +90,23 @@ local List = function(item_type)
   local list_type = Type:new("List(" .. item_type.type .. ")")
   list_type.item_type = item_type
   list_type.is_list = true
+  function list_type:new(t)
+    t = t or {}
+    setmetatable(t, self)
+    self.__index = self
+    return t
+  end
   function list_type:from_json(t)
     local res = {}
     for _, item in ipairs(t) do
       table.insert(res, item_type:from_json(item))
+    end
+    return res
+  end
+  function list_type:to_json_structure()
+    local res = {}
+    for i, v in ipairs(self) do
+      res[#res + 1] = v:to_json_structure()
     end
     return res
   end
@@ -189,13 +214,18 @@ function Inline.get_definitions()
   return Inline.definitions
 end
 
-function Inline.to_json(element)
-  return build_json_structure(element, Inline)
-end
-
-function Inline:build_json_structure()
+function Inline:to_json_structure()
   local eldef = self:get_definition()
-  local json_struct = {}
+  local json_struct = {t = self.type}
+  if #eldef == 0 then
+    json_struct.c = self.content:to_json_structure()
+  else
+    local attr_list = {}
+    for i, _ in ipairs(eldef) do
+      table.insert(attr_list, self[i]:to_json_structure())
+    end
+    json_struct.c = attr_list
+  end
   return json_struct
 end
 
@@ -211,13 +241,13 @@ for eltype, definition in pairs(Inline.definitions) do
   M[eltype] = function (...)
     local element_args = {type = eltype}
     if next(definition) == nil then
-      -- do nothing
+      error("Empty definition")
     elseif #definition == 0 then
       local _, attr_type = next(definition)
       if #attr_type > 0 or attr_type.is_list then
-        element_args.content = {...}
+        element_args.content = attr_type:new{...}
       else
-        element_args.content = ...
+        element_args.content = attr_type:new(...)
       end
     else
       for i, v in ipairs(...) do
