@@ -74,6 +74,21 @@ function Type.__tostring(t)
   return t.type
 end
 
+local List = function(item_type)
+  local list_type = Type:new("List(" .. item_type.type .. ")")
+  list_type.item_type = item_type
+  list_type.is_list = true
+  function list_type:from_json(t)
+    local res = {}
+    for _, item in ipairs(t) do
+      table.insert(res, item_type:from_json(item))
+    end
+    return res
+  end
+  return list_type
+end
+
+
 local MathType = Type:new("MathType")
 
 local Attributes = Type:new("Attributes")
@@ -124,7 +139,7 @@ function Element:from_json(t)
   return element
 end
 
-local Inline = Element:new()
+local Inline = Element:new({type = "Inline"})
 function Inline:new(o)
   o.type = o.type or o.t
   assert(type(o.type) == "string", "No element type was specified")
@@ -145,25 +160,25 @@ end
 Inline.definitions = {
   Cite = {{citations = Citations}, {content = Text}},
   Code = {{attributes = Attributes}, {content = Text}},
-  Emph = {content = {Inline}},
-  Image = {{attributes = Attributes}, {content = {Inline}},
+  Emph = {content = List(Inline)},
+  Image = {{attributes = Attributes}, {content = List(Inline)},
     {{src = Text}, {title = Text}}},
-  Link = {{attributes = Attributes}, {content = {Inline}},
+  Link = {{attributes = Attributes}, {content = List(Inline)},
     {{src = Text}, {title = Text}}},
   LineBreak = {},
   Math = {{format = MathType}, {content = Text}},
   Note = {content = Blocks},
-  Quoted = {{quote_type = QuoteType}, {content = {Inline}}},
+  Quoted = {{quote_type = QuoteType}, {content = List(Inline)}},
   RawInline = {{format = Text}, {content = Text}},
-  SmallCaps = {content = {Inline}},
+  SmallCaps = {content = List(Inline)},
   SoftBreak = {},
   Space = {},
-  Span = {{attributes = Attributes}, {content = {Inline}}},
+  Span = {{attributes = Attributes}, {content = List(Inline)}},
   Str = {content = Text},
-  Strikeout = {content = {Inline}},
-  Strong = {content = {Inline}},
-  Subscript = {content = {Inline}},
-  Superscript = {content = {Inline}}
+  Strikeout = {content = List(Inline)},
+  Strong = {content = List(Inline)},
+  Subscript = {content = List(Inline)},
+  Superscript = {content = List(Inline)}
 }
 
 function Inline:get_definition()
@@ -191,15 +206,15 @@ local M = {
   flattened = flattened
 }
 
--- Also export constructor for each element type
+-- export type constructors for elements
 for eltype, definition in pairs(Inline.definitions) do
-  local function element_creator(...)
+  M[eltype] = function (...)
     local element_args = {type = eltype}
     if next(definition) == nil then
       -- do nothing
     elseif #definition == 0 then
       local _, attr_type = next(definition)
-      if #attr_type > 0 then
+      if #attr_type > 0 or attr_type.is_list then
         element_args.content = {...}
       else
         element_args.content = ...
@@ -207,13 +222,11 @@ for eltype, definition in pairs(Inline.definitions) do
     else
       for i, v in ipairs(...) do
         attr_name, _ = next(definition[i])
-        print(attr_name)
         element_args[attr_name] = v
       end
     end
     return Inline:new(element_args)
   end
-  M[eltype] = element_creator
 end
 
 return M
