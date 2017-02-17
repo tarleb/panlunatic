@@ -7,19 +7,30 @@ env:
   - PANDOC_VERSION=1.17.2-1
   - PANDOC_VERSION=1.19.1-1
 
+addons:
+  apt:
+    packages:
+      - luarocks
+
 before_install:
-  - mkdir pandoc-${PANDOC_VERSION}
-  - >
-      travis_retry curl --location --silent \
-        https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION%-*}/pandoc-${PANDOC_VERSION}-amd64.deb \
-        -o pandoc-${PANDOC_VERSION}/pandoc.deb
-  - cd pandoc-${PANDOC_VERSION}
-  - ar x pandoc.deb
-  - tar zvxf data.tar.gz
-  - cd ..
+  - luarocks install --local dkjson
+
+  # install pandoc
+  - DOWNLOAD_URL="https://github.com/jgm/pandoc/releases/download"
+  - mkdir -p ${HOME}/.local
+  - travis_retry curl --location --silent
+      ${DOWNLOAD_URL}/${PANDOC_VERSION%-*}/pandoc-${PANDOC_VERSION}-amd64.deb
+      -o /tmp/pandoc.deb
+  - ar p /tmp/pandoc.deb data.tar.gz | tar xvz --strip-components 2 -C $HOME/.local/
+
+  # Set path to include pandoc executable
+  - PATH="${HOME}/.local/bin:$PATH"
+
+install:
+  - luarocks make --local rockspecs/panlunatic-scm-0.rockspec
 
 script:
   - git clone https://github.com/tarleb/panlunatic
 
   # Run tests
-  - PATH="${PWD}/pandoc-${PANDOC_VERSION}/usr/bin:$PATH" make test
+  - make test
