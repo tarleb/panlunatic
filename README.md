@@ -2,6 +2,7 @@ Panlunatic
 ==========
 
 [![travis build status](https://img.shields.io/travis/tarleb/panlunatic.svg)](https://travis-ci.org/tarleb/panlunatic)
+[![license](https://img.shields.io/github/license/tarleb/panluna.svg?style=flat-square)](./LICENSE)
 
 Panlunatic writers are Lua scripts intended to be used instead of filters.
 Pandoc includes its very own lua interpreter, so no other software than pandoc
