@@ -13,7 +13,7 @@ description = {
 
 dependencies = {
   "lua >= 5.1",
-  "dkjson >= 1.0",
+  "lunajson >= 1.0",
 }
 
 build = {

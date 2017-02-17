@@ -8,7 +8,7 @@
 
 local panlunatic = {_version = "0.1.3"}
 
-local json = require("dkjson")
+local json = require("lunajson")
 
 local function words(str)
   local t = {}

@@ -13,8 +13,6 @@ addons:
       - luarocks
 
 before_install:
-  - luarocks install --local dkjson
-
   # install pandoc
   - DOWNLOAD_URL="https://github.com/jgm/pandoc/releases/download"
   - mkdir -p ${HOME}/.local
