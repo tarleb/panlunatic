@@ -1,5 +1,8 @@
 PANDOC_VERSION=$(shell pandoc --version | sed -ne 's/^pandoc \([0-9.]*\)/\1/p')
 
+LUA_PATH := src/?.lua;$(LUA_PATH)
+export LUA_PATH
+
 test: dist
 	@echo "Using Pandoc" $(PANDOC_VERSION)
 	@echo "Testing plain JSON conversion..."
