@@ -24,6 +24,7 @@ dist/test:
 release:
 	mkdir -p dist/panlunatic
 	mkdir -p dist/luarocks
+	luarocks make --tree=dist/luarocks rockspecs/panlunatic-scm-0.rockspec
 	luarocks install --tree=dist/luarocks rockspecs/panlunatic-scm-0.rockspec
 	cp -av dist/luarocks/share/lua/5.1/* dist/panlunatic
 	tar zvcf dist/panlunatic.tgz -C dist panlunatic
@@ -31,4 +32,4 @@ release:
 clean:
 	rm -r dist
 
-.PHONY: test clean
+.PHONY: test clean release

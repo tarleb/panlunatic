@@ -11,8 +11,6 @@ addons:
       - luarocks
 
 before_install:
-  - luarocks install --local dkjson
-
   # install pandoc
   - DOWNLOAD_URL="https://github.com/jgm/pandoc/releases/download"
   - mkdir -p ${HOME}/.local
@@ -33,6 +31,10 @@ script:
   - make test
 
 before_deploy:
+  - make clean
+  # install new luarocks version
+  - luarocks install --local luarocks
+  - PATH="${HOME}/.luarocks/bin:${PATH}"
   - make release
 
 deploy:
@@ -43,3 +45,4 @@ deploy:
   file: dist/panlunatic.tgz
   on:
     repo: tarleb/panlunatic
+    tags: true
