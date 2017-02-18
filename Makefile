@@ -3,7 +3,7 @@ PANDOC_VERSION=$(shell pandoc --version | sed -ne 's/^pandoc \([0-9.]*\)/\1/p')
 LUA_PATH := src/?.lua;$(LUA_PATH)
 export LUA_PATH
 
-test: dist
+test: dist/test
 	@echo "Using Pandoc" $(PANDOC_VERSION)
 	@echo "Testing plain JSON conversion..."
 	@PANDOC_VERSION=$(PANDOC_VERSION) \
@@ -18,8 +18,8 @@ test: dist
 	@test -z "$(diff tests/tables.native dist/tables.native)"
 	@echo "Success"
 
-dist:
-	mkdir dist
+dist/test:
+	mkdir -p dist/test
 
 clean:
 	rm -r dist

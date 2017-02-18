@@ -1,6 +1,4 @@
 sudo: false
-
-# Do not choose a language; we provide our own build tools.
 language: generic
 
 env:
@@ -25,15 +23,11 @@ before_install:
 
   # Set path to include pandoc executable
   - PATH="${HOME}/.local/bin:$PATH"
-  # Set lua path to include luarocks
-  - LUA_PATH="$(luarocks path)"
-  - export LUA_PATH
+  # Set lua pat to include luarocks
+  - eval "$(luarocks path)"
 
 install:
   - luarocks make --local rockspecs/panlunatic-scm-0.rockspec
 
 script:
-  - git clone https://github.com/tarleb/panlunatic
-
-  # Run tests
   - make test
