@@ -21,6 +21,13 @@ test: dist/test
 dist/test:
 	mkdir -p dist/test
 
+release:
+	mkdir -p dist/panlunatic
+	mkdir -p dist/luarocks
+	luarocks install --tree=dist/luarocks rockspecs/panlunatic-scm-0.rockspec
+	cp -av dist/luarocks/share/lua/5.1/* dist/panlunatic
+	tar zvcf dist/panlunatic.tgz -C dist panlunatic
+
 clean:
 	rm -r dist
 
