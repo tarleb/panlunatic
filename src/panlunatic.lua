@@ -294,6 +294,7 @@ function panlunatic.DefinitionList(items)
 end
 
 function panlunatic.CaptionedImage(src, tit, caption, attr)
+  attr = attr or {id = "", class = ""} -- workaround for issue jgm/pandoc#2697
   return panlunatic.Para(Image(caption, src, tit, attr):sub(1, -1))
 end
 
