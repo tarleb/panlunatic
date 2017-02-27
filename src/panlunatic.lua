@@ -1,12 +1,12 @@
 --
 -- panlunatic.lua
 --
--- Copyright (c) 2016 Albert Krewinkel
+-- Copyright (c) 2016-2017 Albert Krewinkel
 --
 -- This library is free software; you can redistribute it and/or modify it
 -- under the terms of the ISC license. See LICENSE for details.
 
-local panlunatic = {_version = "0.1.3"}
+local panlunatic = {_version = "0.2.1"}
 
 local json = require("dkjson")
 
