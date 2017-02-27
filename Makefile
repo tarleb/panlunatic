@@ -9,13 +9,19 @@ test: dist/test
 	@PANDOC_VERSION=$(PANDOC_VERSION) \
 	  pandoc --from=native --to=tests/identity.lua tests/testsuite.native |\
 		pandoc --from=json --to=native --standalone -o dist/identity.native
-	@test -z "$(diff tests/testsuite.native dist/identity.native)"
+	@diff tests/testsuite.native dist/identity.native
 	@echo "Success"
 	@echo "Testing table JSON conversion..."
 	@PANDOC_VERSION=$(PANDOC_VERSION) \
 	  pandoc --from=native --to=tests/identity.lua tests/tables.native |\
-		pandoc --from=json --to=native --standalone -o dist/tables.native
-	@test -z "$(diff tests/tables.native dist/tables.native)"
+		pandoc --from=json --to=native -o dist/tables.native
+	@diff tests/tables.native dist/tables.native
+	@echo "Success"
+	@echo "Testing table JSON conversion..."
+	@PANDOC_VERSION=$(PANDOC_VERSION) \
+	  pandoc --from=native --to=tests/identity.lua tests/empty-metafield.native |\
+		pandoc --from=json --to=native --standalone -o dist/empty-metafield.native
+	@diff tests/empty-metafield.native dist/empty-metafield.native
 	@echo "Success"
 
 dist/test:

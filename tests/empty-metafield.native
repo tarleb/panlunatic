@@ -1,0 +1,2 @@
+Pandoc (Meta {unMeta = fromList [("foo",MetaMap (fromList [("bar",MetaList [])]))]})
+[]

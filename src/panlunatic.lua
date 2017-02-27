@@ -85,9 +85,11 @@ end
 -- Convert metadata table to JSON
 function panlunatic.Meta(metadata)
   local buffer = {}
-  for k, v in pairs(metadata) do
-    if type(v) ~= "table" or next(v) ~= nil then
-      table.insert(buffer, json.encode(k) .. ':' .. panlunatic.tometa(v))
+  local metavalue
+  for k,v in pairs(metadata) do
+    metavalue = panlunatic.tometa(v)
+    if metavalue then
+      table.insert(buffer, json.encode(k) .. ":" .. metavalue)
     end
   end
   return '{' .. table.concat(buffer, ',') .. '}'
@@ -112,8 +114,6 @@ function panlunatic.tometa(data)
     return '{"t":"MetaInlines","c":[' .. data:sub(1, -2) .. ']}'
   elseif type(data) == "bool" then
     return '{"t":"MetaBoolean","c":' .. data .. '}'
-  elseif type(data) == "table" and not next(data) then
-    return nil
   elseif is_list(data) then
     local m = {}
     for _,v in ipairs(data) do
@@ -121,11 +121,7 @@ function panlunatic.tometa(data)
     end
     return '{"t":"MetaList","c":[' .. table.concat(m, ',') .. ']}'
   else
-    local m = {}
-    for k,v in pairs(data) do
-      table.insert(m, json.encode(k) .. ":" .. panlunatic.tometa(v))
-    end
-    return '{"t":"MetaMap","c":{' .. table.concat(m, ',') .. '}}'
+    return '{"t":"MetaMap","c":' .. panlunatic.Meta(data) .. '}'
   end
 end
 
