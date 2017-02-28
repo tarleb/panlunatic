@@ -6,7 +6,7 @@
 -- This library is free software; you can redistribute it and/or modify it
 -- under the terms of the ISC license. See LICENSE for details.
 
-local panlunatic = {_version = "0.2.1"}
+local panlunatic = {_version = "1.0.0"}
 
 local json = require("dkjson")
 
