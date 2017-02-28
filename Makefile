@@ -34,6 +34,7 @@ release:
 	luarocks install --tree=dist/luarocks rockspecs/panlunatic-scm-0.rockspec
 	cp -av dist/luarocks/share/lua/5.1/* dist/panlunatic
 	tar zvcf dist/panlunatic.tgz -C dist panlunatic
+	(cd dist && zip -r panlunatic.zip panlunatic)
 
 clean:
 	rm -r dist
