@@ -42,7 +42,9 @@ deploy:
   skip_cleanup: true
   api_key:
     secure: QIms+aO7jagPT2yESnNu59ucYD+Akg71DjvPO3aWz3ijg0JBJspWqfN2oAOKIyUBky0XGmcx6VDkiC0KEhkx4RNsMAGujbvqLbJ20YAfcrieOYqAZYNcq9IyS6+w8/yknaiiR9B8aEFoKrtFV3LlxNTcYdfy/U+Il28IrebCpKOkCgBSFAsQho2Gp6M7ZAoJ70TUAYfIFv2BzOEK80WBqLIbvtoQ0WwFdGbsb3y5C3/J8miD5U2CzKf3fnutiee6sE/eAh7gkZIFQCjMPwUjiHOlHyOBCOn9HtNKAcoAbyd8IbWm2vPdH28QabPnxgEXSTJ+hEWeZQORqJ9EqFv8g5JJ1OeIlk5Vlz6AhVlG/xE+PfOd7zweC1bM4qMwvQPaIELIb4xG9emeq3Sd6crTtYj9Xip2Hd9vaulHD9Qjv1e7X5a5Sogb0QYEzIn9eNXjMqwTpS7MNvXmMGSNTB1PMO4DZnhLRjBr1QhuPlpVsFVKaFTMzUJo3t3kPigYLA9KPCNZskWTYFypfOJM8HAxy+W41QzDPp6Zg92MCtF7qPrvH5rCGEcd0Z1GtwDKYJhE8nefnn32F/8FCDYBL9tq4gKgv5OHn9a9qw+afH7wqTfjMKZ/gLaq7VXZXX1wHOBq0aOlIX8WhFGt6McVs84psWwRIoed/JrhcJzaWYo/nuo=
-  file: dist/panlunatic.tgz
+  file:
+    - dist/panlunatic.tgz
+    - dist/panlunatic.zip
   on:
     repo: tarleb/panlunatic
     tags: true
