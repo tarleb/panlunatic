@@ -112,8 +112,8 @@ function panlunatic.tometa(data)
     return '{"t":"MetaString","c":"' .. tostring(data) .. '"}'
   elseif type(data) == 'string' then
     return '{"t":"MetaInlines","c":[' .. data:sub(1, -2) .. ']}'
-  elseif type(data) == "bool" then
-    return '{"t":"MetaBoolean","c":' .. data .. '}'
+  elseif type(data) == "boolean" then
+    return '{"t":"MetaBool","c":' .. tostring(data) .. '}'
   elseif is_list(data) then
     local m = {}
     for _,v in ipairs(data) do
