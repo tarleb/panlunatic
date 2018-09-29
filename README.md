@@ -1,6 +1,9 @@
 Panlunatic
 ==========
 
+:warning: **DEPRECATED** :warning: This package is no longer maintained. Use
+pandoc's [Lua filters](https://pandoc.org/lua-filters.html) instead.
+
 [![github release](https://img.shields.io/github/release/tarleb/panlunatic.svg?label=current+release)](https://github.com/tarleb/panlunatic/releases)
 [![license](https://img.shields.io/github/license/tarleb/panlunatic.svg?style=flat-square)](./LICENSE)
 [![travis build status](https://img.shields.io/travis/tarleb/panlunatic/master.svg?style=flat-square)](https://travis-ci.org/tarleb/panlunatic)
